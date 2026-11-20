@@ -509,6 +509,7 @@ model ProviderProfile {
   documents              ProviderDocument[]
   portfolio              ProviderPortfolio[]
   categories             ProviderCategory[]
+  providerServices       ProviderService[]
   serviceAreas           ProviderServiceArea[]
   availability           ProviderAvailability[]
   availabilityExceptions ProviderAvailabilityException[]
@@ -626,6 +627,25 @@ model ProviderCategory {
   @@map("provider_categories")
 }
 
+model ProviderService {
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerProfileId String          @map("provider_profile_id") @db.Uuid
+  serviceId         String          @map("service_id") @db.Uuid
+  description       String?         @db.Text
+  priceFrom         Decimal?        @map("price_from") @db.Decimal(12, 2)
+  priceTo           Decimal?        @map("price_to") @db.Decimal(12, 2)
+  currency          String          @default("LKR") @db.Char(3)
+  isActive          Boolean         @default(true) @map("is_active")
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  service           Service         @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@unique([providerProfileId, serviceId])
+  @@index([serviceId, isActive, providerProfileId])
+  @@map("provider_services")
+}
+
 model ProviderServiceArea {
   id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   providerProfileId String          @map("provider_profile_id") @db.Uuid
@@ -712,6 +732,8 @@ model Service {
   updatedAt   DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt   DateTime?          @map("deleted_at") @db.Timestamptz(6)
   category    Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  providerServices ProviderService[]
+  requestServices  ServiceRequestService[]
 
   @@index([categoryId, isActive])
   @@map("services")
@@ -761,6 +783,7 @@ model ServiceRequest {
   address          CustomerAddress?           @relation(fields: [addressId], references: [id], onDelete: SetNull)
   location         Location?                  @relation(fields: [locationId], references: [id], onDelete: SetNull)
   categories       ServiceRequestCategory[]
+  services         ServiceRequestService[]
   attachments      ServiceRequestAttachment[]
   recipients       ServiceRequestRecipient[]
   enquiries        Enquiry[]
@@ -787,6 +810,20 @@ model ServiceRequestCategory {
   @@unique([serviceRequestId, categoryId])
   @@index([categoryId, serviceRequestId])
   @@map("service_request_categories")
+}
+
+model ServiceRequestService {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  serviceRequestId String         @map("service_request_id") @db.Uuid
+  serviceId        String         @map("service_id") @db.Uuid
+  isPrimary        Boolean        @default(false) @map("is_primary")
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  service          Service        @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@unique([serviceRequestId, serviceId])
+  @@index([serviceId, serviceRequestId])
+  @@map("service_request_services")
 }
 
 model ServiceRequestAttachment {

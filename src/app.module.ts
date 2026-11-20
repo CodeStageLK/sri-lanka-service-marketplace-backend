@@ -11,6 +11,11 @@ import { RolesGuard } from './guards/roles.guard';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
+import { LocationsModule } from './modules/locations/locations.module';
+import { ProvidersModule } from './modules/providers/providers.module';
+import { ProviderMatchingModule } from './modules/provider-matching/provider-matching.module';
+import { ServiceRequestsModule } from './modules/service-requests/service-requests.module';
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import { HealthModule } from './modules/health/health.module';
     StorageModule,
     AuthModule,
     HealthModule,
+    CatalogModule,
+    LocationsModule,
+    ProvidersModule,
+    ProviderMatchingModule,
+    ServiceRequestsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

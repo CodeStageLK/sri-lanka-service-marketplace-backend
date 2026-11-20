@@ -1,5 +1,32 @@
 # Implementation Progress
 
+## Phase 5: core marketplace backend services
+
+- Added catalog, location, provider profile/discovery, provider assignment,
+  service-request, provider-matching, and enquiry NestJS modules.
+- Added public discovery and administrator/provider/customer endpoint groups
+  under `/api/v1`, with existing Phase 4 guards and seeded permissions.
+- Added forward-only migration
+  `20261121000000_phase5_marketplace_services` for provider-service assignments
+  and request-service selections. This migration has not been applied to
+  production.
+- Added marketplace architecture and workflow documentation.
+- Verification status: Prisma generation, TypeScript typecheck, and backend build
+  are being run; migration deployment remains explicitly unrequested.
+
+### Phase 5 verification (actual results)
+
+- `pnpm run prisma:generate`: passed.
+- `pnpm exec dotenv -e .env.local -e .env -- prisma validate`: passed.
+- `pnpm run typecheck`: passed.
+- `pnpm run lint`: passed.
+- `pnpm test -- --runInBand`: 34 tests passed across 7 suites, including the
+  new provider matching eligibility unit tests.
+- `pnpm run build`: passed.
+- No database migration was applied. Migration
+  `20261121000000_phase5_marketplace_services` remains ready for isolated
+  branch testing and explicit production deployment approval.
+
 ## Phase 1: repository foundation
 
 - Four independent application directories, with no parent package manager workspace.
